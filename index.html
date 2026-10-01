@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Small Wins" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <title>Small Wins</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="dateLabel"></p>
+        <h1 id="greeting">Today.</h1>
+        <p class="subhead">One thing at a time.</p>
+      </div>
+      <div class="top-actions">
+        <button id="settingsButton" class="icon-button" type="button" aria-label="Settings" title="Settings">⚙</button>
+        <div class="xp-pill" aria-label="Experience points">
+          <span class="xp-dot"></span>
+          <span><strong id="xpValue">0</strong> XP</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="Progress">
+      <div>
+        <strong id="openCount">0</strong>
+        <span>open</span>
+      </div>
+      <span class="summary-divider"></span>
+      <div>
+        <strong id="doneTodayCount">0</strong>
+        <span>done today</span>
+      </div>
+    </section>
+
+    <section class="composer" aria-label="Add a task">
+      <form id="taskForm" autocomplete="off">
+        <div class="add-row">
+          <input id="taskInput" maxlength="160" placeholder="What needs to get done?" aria-label="Task" required autofocus />
+          <button class="add-button icon-only" type="submit" aria-label="Add task" title="Add task">
+            <span class="add-plus" aria-hidden="true">+</span>
+          </button>
+        </div>
+
+        <div class="composer-tools">
+          <button class="remind-toggle" id="remindToggle" type="button" aria-expanded="false">
+            <span aria-hidden="true">◷</span>
+            <span id="remindToggleText">Add reminder</span>
+          </button>
+          <button id="clearDraftReminder" class="clear-draft-reminder" type="button" hidden>Remove</button>
+        </div>
+
+        <div class="reminder-panel" id="reminderPanel" hidden>
+          <div class="preset-row" aria-label="Reminder shortcuts">
+            <button type="button" class="preset" data-preset="hour">In 1 hour</button>
+            <button type="button" class="preset" data-preset="tonight">Tonight</button>
+            <button type="button" class="preset" data-preset="tomorrow">Tomorrow morning</button>
+          </div>
+          <label class="custom-reminder">
+            <span>Or choose a time</span>
+            <input id="reminderInput" type="datetime-local" />
+          </label>
+        </div>
+      </form>
+    </section>
+
+    <section class="tasks-section" aria-live="polite">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-mark">✓</div>
+        <p>Nothing waiting on you.</p>
+        <span>Add one thing and get moving.</span>
+      </div>
+      <ul id="taskList" class="task-list" aria-label="Open tasks"></ul>
+    </section>
+
+    <section id="completedSection" class="completed-section" hidden>
+      <button id="completedToggle" class="completed-toggle" type="button" aria-expanded="false">
+        <span>Completed <span id="completedCount">0</span></span>
+        <span class="chevron">⌄</span>
+      </button>
+      <div id="completedBody" hidden>
+        <ul id="completedList" class="task-list completed-list" aria-label="Completed tasks"></ul>
+        <button id="clearCompleted" class="clear-completed" type="button">Clear completed</button>
+      </div>
+    </section>
+
+    <footer>
+      <span class="status-text">On-device · offline ready</span>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <div class="toast-icon">✓</div>
+    <div class="toast-copy">
+      <strong id="toastTitle">Nice work.</strong>
+      <p id="toastMessage">That counts.</p>
+    </div>
+    <div class="toast-right">
+      <span class="toast-xp" id="toastXp">+10 XP</span>
+      <button id="undoButton" class="undo-button" type="button" hidden>Undo</button>
+    </div>
+  </div>
+
+  <dialog id="editDialog" class="dialog">
+    <form id="editForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="dialog-kicker">Task</p>
+          <h2>Edit task</h2>
+        </div>
+        <button id="closeEdit" class="dialog-close" type="button" aria-label="Close">×</button>
+      </div>
+      <label class="field">
+        <span>Task</span>
+        <input id="editTitle" maxlength="160" required />
+      </label>
+      <label class="field">
+        <span>Reminder</span>
+        <input id="editReminder" type="datetime-local" />
+      </label>
+      <div class="dialog-actions split-actions">
+        <button id="deleteFromEdit" class="danger-button" type="button">Delete</button>
+        <div>
+          <button id="cancelEdit" class="secondary-button" type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="dialog settings-dialog">
+    <form id="settingsForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="dialog-kicker">Small Wins</p>
+          <h2>Settings</h2>
+        </div>
+        <button id="closeSettings" class="dialog-close" type="button" aria-label="Close">×</button>
+      </div>
+<section class="settings-section reminder-setting">
+        <div class="setting-copy">
+          <strong>Reminders</strong>
+          <span>Local</span>
+        </div>
+        <p class="setting-note">Reminder times stay on this device. Due reminders appear while Small Wins is open, and overdue reminders appear when you return. Background lock-screen delivery is not enabled in this web version.</p>
+      </section>
+    </form>
+  </dialog>
+
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+  <script src="app.js"></script>
+</body>
+</html>
